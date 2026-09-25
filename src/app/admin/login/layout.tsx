@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
-import { SITE_NAME } from "@/lib/brand";
+import { getSiteSettings, DEFAULT_SITE_SETTINGS } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: `Admin | ${SITE_NAME}`,
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings().catch(() => DEFAULT_SITE_SETTINGS);
+  return {
+    title: `Admin | ${settings.siteName}`,
+    robots: { index: false, follow: false },
+  };
+}
 
 export default function AdminLoginLayout({ children }: { children: React.ReactNode }) {
   return children;

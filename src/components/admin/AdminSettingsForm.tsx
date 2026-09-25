@@ -11,13 +11,15 @@ type SettingsFormState = Omit<SiteSettings, "heroRotatingWords" | "seoKeywords">
   seoKeywords: string;
 };
 
-type FieldType = "text" | "textarea" | "logo";
+type FieldType = "text" | "textarea" | "image";
 
 interface SettingsField {
   key: keyof SettingsFormState;
   label: string;
   type?: FieldType;
   placeholder?: string;
+  /** Short hint rendered under the label. */
+  help?: string;
 }
 
 interface SettingsGroup {
@@ -33,7 +35,7 @@ const SETTINGS_GROUPS: SettingsGroup[] = [
     fields: [
       { key: "siteName", label: "Site Name" },
       { key: "siteNameShort", label: "Short Name" },
-      { key: "logoUrl", label: "Logo", type: "logo" },
+      { key: "logoUrl", label: "Logo", type: "image", placeholder: "/logo.png" },
     ],
   },
   {
@@ -65,6 +67,13 @@ const SETTINGS_GROUPS: SettingsGroup[] = [
     id: "hero",
     label: "Hero",
     fields: [
+      {
+        key: "heroBannerUrl",
+        label: "Main Banner Image",
+        type: "image",
+        placeholder: "/banner.jpeg",
+        help: "Wide artwork at the top of the homepage. Around 1600×780 works best. Leave empty to restore the built-in banner.",
+      },
       { key: "heroBadge", label: "Hero Badge" },
       { key: "heroTitlePrefix", label: "Hero Title Prefix" },
       {
@@ -174,7 +183,7 @@ const SETTINGS_GROUPS: SettingsGroup[] = [
     fields: [
       { key: "faqPageTitle", label: "FAQ Page Title" },
       { key: "faqPageSubtitle", label: "FAQ Page Subtitle", type: "textarea" },
-      { key: "faqImageUrl", label: "FAQ Image", type: "logo", placeholder: "/home-watch.jfif" },
+      { key: "faqImageUrl", label: "FAQ Image", type: "image", placeholder: "/home-watch.jfif" },
       { key: "faqContactTitle", label: "FAQ Contact Box Title" },
       { key: "faqContactDescription", label: "FAQ Contact Box Text", type: "textarea" },
     ],
@@ -527,17 +536,27 @@ export default function AdminSettingsForm({
               {group.fields.map((field) => {
                 const value = String(settings[field.key] ?? "");
 
-                if (field.type === "logo") {
+                if (field.type === "image") {
                   return (
                     <div key={field.key} className="md:col-span-2 space-y-3">
                       <label className="block text-ld-light text-sm mb-2">{field.label}</label>
+                      {field.help && (
+                        <p className="text-ld-silver text-xs -mt-1">{field.help}</p>
+                      )}
                       <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
-                        <div className="relative h-16 w-28 rounded-xl overflow-hidden bg-ld-dark border border-ld-grey/40 shrink-0">
+                        <div className="relative h-20 w-36 rounded-xl overflow-hidden bg-ld-dark border border-ld-grey/40 shrink-0">
                           {value ? (
-                            <Image src={value} alt="Logo preview" fill className="object-contain p-2" sizes="112px" />
+                            <Image
+                              src={value}
+                              alt={`${field.label} preview`}
+                              fill
+                              className="object-contain p-2"
+                              sizes="144px"
+                              unoptimized
+                            />
                           ) : (
                             <div className="h-full flex items-center justify-center text-xs text-ld-silver">
-                              No logo
+                              No image
                             </div>
                           )}
                         </div>
@@ -546,7 +565,7 @@ export default function AdminSettingsForm({
                             value={value}
                             onChange={(e) => update(field.key, e.target.value)}
                             className={inputClass}
-                            placeholder="/logo.png"
+                            placeholder={field.placeholder || "/image.png or full image URL"}
                           />
                           <input
                             type="file"
@@ -557,7 +576,7 @@ export default function AdminSettingsForm({
                             className="block text-sm text-ld-light"
                           />
                           {uploadingLogo && (
-                            <p className="text-ld-silver text-xs">Uploading logo...</p>
+                            <p className="text-ld-silver text-xs">Uploading image...</p>
                           )}
                         </div>
                       </div>

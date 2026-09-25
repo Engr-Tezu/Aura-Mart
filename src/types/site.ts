@@ -29,6 +29,8 @@ export interface SiteSettings {
   heroTitlePrefix: string;
   heroRotatingWords: string[];
   heroDescription: string;
+  /** Wide artwork at the top of the homepage. */
+  heroBannerUrl: string;
   /** Scrolling strip above the navbar. Empty falls back to contact details. */
   announcementMessages: string[];
   collectionTitle: string;

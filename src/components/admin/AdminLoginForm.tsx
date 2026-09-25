@@ -4,11 +4,11 @@ import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Lock, Mail, AlertCircle } from "lucide-react";
-import { SITE_NAME_SHORT } from "@/lib/brand";
 import SiteLogo from "@/components/ui/SiteLogo";
+import { AdminBrandInfo } from "./AdminBrand";
 import TypewriterRotate from "@/components/ui/TypewriterRotate";
 
-export default function AdminLoginForm() {
+export default function AdminLoginForm({ brand }: { brand: AdminBrandInfo }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -66,10 +66,10 @@ export default function AdminLoginForm() {
           className="relative text-center"
         >
           <div className="flex justify-center mb-8 px-4">
-            <SiteLogo size="hero" />
+            <SiteLogo size="hero" logoUrl={brand.logoUrl} alt={brand.name} />
           </div>
 
-          <h1 className="sr-only">{SITE_NAME_SHORT} WATCHES Admin</h1>
+          <h1 className="sr-only">{brand.name} Admin</h1>
 
           <p className="text-ld-gold-light text-lg mb-2 tracking-wide">
             <TypewriterRotate
@@ -101,9 +101,9 @@ export default function AdminLoginForm() {
         >
           <div className="text-center mb-8 lg:text-left">
             <div className="flex items-center justify-center lg:justify-start gap-3 mb-4 lg:hidden">
-              <SiteLogo size="admin" />
+              <SiteLogo size="admin" logoUrl={brand.logoUrl} alt={brand.name} />
               <span className="font-[family-name:var(--font-display)] text-xl font-bold text-white sr-only">
-                {SITE_NAME_SHORT} <span className="text-gradient-gold">Admin</span>
+                {brand.name} <span className="text-gradient-gold">Admin</span>
               </span>
             </div>
             <h2 className="text-2xl font-bold text-white mb-1 hidden lg:block">Welcome back</h2>
