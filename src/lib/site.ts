@@ -131,6 +131,31 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   shippingPageSubtitle: "Clear information about delivery and our return process.",
 };
 
+/**
+ * Settings whose value is an array; the API parses each of these itself.
+ * Everything else in DEFAULT_SITE_SETTINGS is a plain string.
+ */
+export const SETTINGS_ARRAY_KEYS = [
+  "seoKeywords",
+  "heroRotatingWords",
+  "announcementMessages",
+  "aboutBlocks",
+  "faqs",
+] as const satisfies ReadonlyArray<keyof SiteSettings>;
+
+/**
+ * Every plain-string setting the API will accept, derived from the defaults
+ * rather than hand-listed — adding a field to DEFAULT_SITE_SETTINGS is enough
+ * for it to save. A hand-maintained list silently dropped new fields before.
+ */
+export const SETTINGS_STRING_KEYS = (
+  Object.keys(DEFAULT_SITE_SETTINGS) as Array<keyof SiteSettings>
+).filter(
+  (key) =>
+    key !== "_id" &&
+    !(SETTINGS_ARRAY_KEYS as ReadonlyArray<keyof SiteSettings>).includes(key)
+);
+
 /** Field names that are plain strings falling back to DEFAULT_SITE_SETTINGS. */
 const SIMPLE_TEXT_KEYS = [
   "heroBannerUrl",

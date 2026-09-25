@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { getAdminSession } from "@/lib/auth";
-import { getSiteSettings, upsertSiteSettings } from "@/lib/site";
+import { getSiteSettings, upsertSiteSettings, SETTINGS_STRING_KEYS } from "@/lib/site";
 import { SiteSettings } from "@/types/site";
 
 export async function GET() {
@@ -28,40 +28,9 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const payload: Partial<SiteSettings> = {};
 
-    const stringFields: Array<keyof SiteSettings> = [
-      "siteName",
-      "siteNameShort",
-      "logoUrl",
-      "contactPhone",
-      "contactEmail",
-      "contactAddress",
-      "whatsappNumber",
-      "siteUrl",
-      "seoTitle",
-      "seoDescription",
-      "seoOgImage",
-      "heroBadge",
-      "heroTitlePrefix",
-      "heroDescription",
-      "collectionTitle",
-      "collectionSubtitle",
-      "aboutTitle",
-      "aboutTagline",
-      "faqPageTitle",
-      "faqPageSubtitle",
-      "faqImageUrl",
-      "shippingPolicyTitle",
-      "shippingPolicyContent",
-      "returnPolicyTitle",
-      "returnPolicyContent",
-      "reviewsSectionTitle",
-      "reviewsSectionSubtitle",
-      "contactSectionTitle",
-      "contactSectionDescription",
-      "contactButtonLabel",
-    ];
-
-    for (const key of stringFields) {
+    // Derived from DEFAULT_SITE_SETTINGS, so a newly added setting saves
+    // without also having to be registered here.
+    for (const key of SETTINGS_STRING_KEYS) {
       if (pickDefined(body[key])) {
         (payload as Record<string, unknown>)[key] = body[key];
       }
@@ -82,6 +51,18 @@ export async function PUT(request: NextRequest) {
         : String(body.heroRotatingWords || "")
             .split(",")
             .map((word: string) => word.trim())
+            .filter(Boolean);
+    }
+
+    // Ticker messages may contain commas, so they are split on newlines only.
+    if (pickDefined(body.announcementMessages)) {
+      payload.announcementMessages = Array.isArray(body.announcementMessages)
+        ? body.announcementMessages
+            .map((message: unknown) => String(message ?? "").trim())
+            .filter(Boolean)
+        : String(body.announcementMessages || "")
+            .split(/\r?\n/)
+            .map((line: string) => line.trim())
             .filter(Boolean);
     }
 
